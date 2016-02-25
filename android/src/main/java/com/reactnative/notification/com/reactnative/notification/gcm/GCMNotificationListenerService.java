@@ -1,4 +1,4 @@
-package com.reactnative.notification;
+package com.reactnative.notification.com.reactnative.notification.gcm;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,10 +8,12 @@ import org.mozilla.javascript.*;
 import java.util.Map;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.reactnative.notification.NotificationAttributes;
+import com.reactnative.notification.NotificationManager;
 
 public class GCMNotificationListenerService extends GcmListenerService {
 
-    private static final String TAG = "GCMNotificationListenerService";
+    private static final String TAG = "GCMService";
 
     // This is compressed manually from the encodeNativeNotification function
     // in index.js
