@@ -33,7 +33,6 @@ import android.util.Log;
  * Provides JS accessible API, bridge Java and JavaScript.
  */
 public class ReactNativeNotificationModule extends ReactContextBaseJavaModule {
-    final static String PREFERENCES_KEY = "ReactNativeSystemNotification";
     public Activity mActivity = null;
     public Context mContext = null;
     public NotificationManager mNotificationManager = null;

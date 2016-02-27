@@ -1,4 +1,4 @@
-package com.reactnative.notification.com.reactnative.notification.gcm;
+package com.reactnative.notification.gcm;
 
 import android.content.Intent;
 
