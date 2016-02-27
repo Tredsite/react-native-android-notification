@@ -19,12 +19,18 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableNativeArray;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.reactnative.notification.gcm.RegistrationIntentService;
 
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import android.os.Handler;
 import android.util.Log;
 
 /**
@@ -36,6 +42,7 @@ public class ReactNativeNotificationModule extends ReactContextBaseJavaModule {
     public Activity mActivity = null;
     public Context mContext = null;
     public NotificationManager mNotificationManager = null;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     @Override
     public String getName() {
@@ -53,6 +60,8 @@ public class ReactNativeNotificationModule extends ReactContextBaseJavaModule {
         this.mNotificationManager = (NotificationManager) new NotificationManager(reactContext);
 
         listenNotificationEvent();
+        listenGCMIDEvent();
+        listenGCMMessageEvent();
     }
 
     /**
@@ -155,7 +164,36 @@ public class ReactNativeNotificationModule extends ReactContextBaseJavaModule {
         return notificationAttributes;
     }
 
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(mActivity);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(mActivity, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i("Error", "This device is not supported.");
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private void startServiceGCMIDReceive() {
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(mActivity, RegistrationIntentService.class);
+            mActivity.startService(intent);
+        }
+    }
     private void listenNotificationEvent() {
+
         IntentFilter intentFilter = new IntentFilter("NotificationEvent");
 
         getReactApplicationContext().registerReceiver(new BroadcastReceiver() {
@@ -170,6 +208,55 @@ public class ReactNativeNotificationModule extends ReactContextBaseJavaModule {
                 params.putString("payload", extras.getString(NotificationEventReceiver.PAYLOAD));
 
                 sendEvent("ReactNativeNotificationEventFromNative", params);
+            }
+        }, intentFilter);
+    }
+
+    private void listenGCMIDEvent() {
+        startServiceGCMIDReceive();
+        IntentFilter intentFilter = new IntentFilter("GCMIDEvent");
+
+        getReactApplicationContext().registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                try {
+                    Bundle extras = intent.getExtras();
+
+                    final WritableMap params = Arguments.createMap();
+                    params.putString("id", extras.getString("id"));
+
+                    if (getReactApplicationContext().hasActiveCatalystInstance()) {
+                        sendEvent("GCMNotificationID", params);
+                    } else {
+                        new Timer().schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                sendEvent("GCMNotificationID", params);
+                            }
+                        }, 1000);
+                    }
+
+                } catch (Exception e) {
+
+                }
+            }
+        }, intentFilter);
+
+    }
+
+    private void listenGCMMessageEvent() {
+        IntentFilter intentFilter = new IntentFilter("GCMMessageEvent");
+
+        getReactApplicationContext().registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                Bundle extras = intent.getExtras();
+
+                WritableMap params = Arguments.createMap();
+                params.putString("message", extras.getString("message"));
+
+                sendEvent("GCMMessageEvent", params);
             }
         }, intentFilter);
     }

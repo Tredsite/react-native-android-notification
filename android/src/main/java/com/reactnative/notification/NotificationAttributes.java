@@ -171,4 +171,27 @@ public class NotificationAttributes {
 
         return (ReadableMap) writableMap;
     }
+
+    public void setAttributes(int id, String title, String message) {
+        priority = 1;
+        sound = "default";
+        vibrate = "default";
+        lights = "default";
+        this.id = id;
+        this.subject = title;
+        this.message = message;
+        this.delayed = true;
+        this.delay = 1000;
+        autoClear = true;
+        action = "Default";
+        largeIcon = smallIcon = "ic_launcher";
+        payload = "{}";
+        scheduled = false;
+        if (this.subject.length() > 0) {
+            tickerText = this.subject + ": " + this.message;
+        } else {
+            tickerText = this.message;
+        }
+
+    }
 }

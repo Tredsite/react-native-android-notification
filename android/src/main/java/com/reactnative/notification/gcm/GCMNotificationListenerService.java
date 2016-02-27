@@ -22,45 +22,23 @@ public class GCMNotificationListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle bundle) {
-        sendNotification(bundle);
-
         String notificationString = bundle.getString("notification");
 
         if (notificationString != null) {
+            Intent broadcastIntent = new Intent("GCMMessageEvent");
+            broadcastIntent.putExtra("message", notificationString);
+            this.sendBroadcast(broadcastIntent);
+
             sendSysNotification(notificationString);
         }
     }
 
-    private void sendNotification(Bundle bundle) {
-        Log.d(TAG, "sendNotification");
 
-        Intent i = new Intent("com.oney.gcm.GCMReceiveNotification");
-        i.putExtra("bundle", bundle);
-        sendOrderedBroadcast(i, null);
-    }
 
     private void sendSysNotification(String notificationString) {
-        Object[] functionParams = new Object[] { notificationString };
-
-        Context rhino = Context.enter();
-        rhino.setOptimizationLevel(-1);
-
-        Scriptable scope = rhino.initStandardObjects();
-
-        rhino.evaluateString(scope, NOTIFICATION_ATTRIBUTES_JS_PARSING_CODE, "script", 1, null);
-
-        Function function = (Function) scope.get("encodeNativeNotification", scope);
-
-        Object parsedParams = function.call(rhino, scope, scope, functionParams);
-
-        Gson gson = new Gson();
-        String parsedParamsJson = gson.toJson(parsedParams);
-
-        Log.d(TAG, "Notification parsedParams: " + parsedParamsJson);
 
         NotificationAttributes notificationAttributes = new NotificationAttributes();
-        notificationAttributes.loadFromMap((Map) parsedParams);
-
+        notificationAttributes.setAttributes((int)(Math.random() * 1000), "GCM Notification", notificationString);
         NotificationManager nm = new NotificationManager(this);
         nm.create(notificationAttributes.id, notificationAttributes);
     }

@@ -181,3 +181,11 @@ DeviceEventEmitter.addListener('ReactNativeNotificationEventFromNative', functio
 
   DeviceEventEmitter.emit('jsMoudleReactNativeNotificationClick', event);
 });
+
+DeviceEventEmitter.addListener('GCMNotificationID', function(e) {
+  console.info("GCMNotificationID: " + e.id)
+});
+
+DeviceEventEmitter.addListener('GCMMessageEvent', function(e) {
+  console.info("GCMMessageEvent: " + e.message)
+});
