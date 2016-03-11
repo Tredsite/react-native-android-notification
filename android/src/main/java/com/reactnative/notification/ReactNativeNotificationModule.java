@@ -59,14 +59,19 @@ public class ReactNativeNotificationModule extends ReactContextBaseJavaModule {
         this.mActivity = activity;
         this.mNotificationManager = (NotificationManager) new NotificationManager(reactContext);
 
-        listenNotificationEvent();
-        listenGCMIDEvent();
-        listenGCMMessageEvent();
+
     }
 
     /**
      * React method to create or update a notification.
      */
+    @ReactMethod
+    public void registerDevice() {
+        listenNotificationEvent();
+        listenGCMIDEvent();
+        listenGCMMessageEvent();
+    }
+
     @ReactMethod
     public void createNotification(
         Integer notificationID,

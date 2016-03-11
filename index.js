@@ -7,6 +7,9 @@ var ReactNativeNotificationModule = require('react-native').NativeModules.ReactN
 
 // Warp the native module so we can do some pre/post processing to have a cleaner API.
 var Notification = {
+  registerCallback :null,
+  notificationCallback: null,
+
   scheduleLocalNotification: function(attributes = {}) {
     return new Promise(function(resolve, reject) {
       ReactNativeNotificationModule.getApplicationName(function(e) {}, function(applicationName) {
@@ -38,6 +41,34 @@ var Notification = {
 
         listener(event);
       }
+  },
+
+  registerDevice() {
+    var component = this;
+    DeviceEventEmitter.addListener('GCMNotificationID', function(e) {
+      if (component.registerCallback) {
+        component.registerCallback(e.id);
+      }
+      console.info("GCMNotificationID: " + e.id)
+    });
+
+    DeviceEventEmitter.addListener('GCMMessageEvent', function(e) {
+      if (component.notificationCallback) {
+        component.notificationCallback(e.message);
+      }
+      console.info("GCMMessageEvent: " + e.message)
+    });
+
+    ReactNativeNotificationModule.registerDevice();
+  },
+
+  addEventListener: function(type, callback) {
+    if (type == "register") {
+      this.registerCallback = callback;
+      this.registerDevice();
+    } else if (type == 'notification') {
+      this.notificationCallback = callback;
+    }
   },
   
   module: ReactNativeNotificationModule
@@ -182,10 +213,3 @@ DeviceEventEmitter.addListener('ReactNativeNotificationEventFromNative', functio
   DeviceEventEmitter.emit('jsMoudleReactNativeNotificationClick', event);
 });
 
-DeviceEventEmitter.addListener('GCMNotificationID', function(e) {
-  console.info("GCMNotificationID: " + e.id)
-});
-
-DeviceEventEmitter.addListener('GCMMessageEvent', function(e) {
-  console.info("GCMMessageEvent: " + e.message)
-});
