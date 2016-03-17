@@ -22,7 +22,7 @@ public class GCMNotificationListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle bundle) {
-        String notificationString = bundle.getString("notification");
+        String notificationString = bundle.getString("default");
 
         if (notificationString != null) {
             Intent broadcastIntent = new Intent("GCMMessageEvent");
@@ -33,10 +33,7 @@ public class GCMNotificationListenerService extends GcmListenerService {
         }
     }
 
-
-
     private void sendSysNotification(String notificationString) {
-
         NotificationAttributes notificationAttributes = new NotificationAttributes();
         notificationAttributes.setAttributes((int)(Math.random() * 1000), "GCM Notification", notificationString);
         NotificationManager nm = new NotificationManager(this);
