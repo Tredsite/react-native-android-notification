@@ -7,6 +7,9 @@ var ReactNativeNotificationModule = require('react-native').NativeModules.ReactN
 
 // Warp the native module so we can do some pre/post processing to have a cleaner API.
 var Notification = {
+  registerCallback :null,
+  notificationCallback: null,
+
   scheduleLocalNotification: function(attributes = {}) {
     return new Promise(function(resolve, reject) {
       ReactNativeNotificationModule.getApplicationName(function(e) {}, function(applicationName) {
@@ -27,22 +30,49 @@ var Notification = {
     });
   },
 
-  addEventListener: function(type, listener) {
-    DeviceEventEmitter.addListener(type, listener);
+  addListener: function(listener) {
+      DeviceEventEmitter.addListener('jsMoudleReactNativeNotificationClick', listener);
 
-    if (this.module.initialSysNotificationPayload) {
-      var event = {
-        action: this.module.initialSysNotificationAction,
-        payload: JSON.parse(this.module.initialSysNotificationPayload)
-      };
+      if (this.module.initialSysNotificationPayload) {
+        var event = {
+          action: this.module.initialSysNotificationAction,
+          payload: JSON.parse(this.module.initialSysNotificationPayload)
+        }
 
-      listener(event);
-    }
+        listener(event);
+      }
   },
 
-  module: ReactNativeNotificationModule
-};
+  registerDevice() {
+    var component = this;
+    DeviceEventEmitter.addListener('GCMNotificationID', function(e) {
+      if (component.registerCallback) {
+        component.registerCallback(e.id);
+      }
+      console.info("GCMNotificationID: " + e.id)
+    });
 
+    DeviceEventEmitter.addListener('GCMMessageEvent', function(e) {
+      if (component.notificationCallback) {
+        component.notificationCallback(e.message);
+      }
+      console.info("GCMMessageEvent: " + e.message)
+    });
+
+    ReactNativeNotificationModule.registerDevice();
+  },
+
+  addEventListener: function(type, callback) {
+    if (type == "register") {
+      this.registerCallback = callback;
+      this.registerDevice();
+    } else if (type == 'notification') {
+      this.notificationCallback = callback;
+    }
+  },
+  
+  module: ReactNativeNotificationModule
+}
 function encodeNativeNotification(attributes) {
   if (typeof attributes === 'string') attributes = JSON.parse(attributes);
   // Set defaults
@@ -178,19 +208,8 @@ DeviceEventEmitter.addListener('ReactNativeNotificationEventFromNative', functio
   var event = {
     action: e.action,
     payload: JSON.parse(e.payload)
-  };
+  }
 
   DeviceEventEmitter.emit('jsMoudleReactNativeNotificationClick', event);
 });
 
-DeviceEventEmitter.addListener('GCMNotificationID', function(e) {
-  DeviceEventEmitter.emit('register', e.id);
-});
-
-DeviceEventEmitter.addListener('GCMMessageEvent', function(e) {
-  DeviceEventEmitter.emit('notification', {
-    getMessage: function() {
-      return e.message;
-    }
-  });
-});
