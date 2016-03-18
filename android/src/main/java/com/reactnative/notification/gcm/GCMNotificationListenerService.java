@@ -35,7 +35,7 @@ public class GCMNotificationListenerService extends GcmListenerService {
 
     private void sendSysNotification(String notificationString) {
         NotificationAttributes notificationAttributes = new NotificationAttributes();
-        notificationAttributes.setAttributes((int)(Math.random() * 1000), "GCM Notification", notificationString);
+        notificationAttributes.setAttributes((int)(Math.random() * 1000), "TRED", notificationString);
         NotificationManager nm = new NotificationManager(this);
         nm.create(notificationAttributes.id, notificationAttributes);
     }

@@ -180,8 +180,7 @@ public class NotificationAttributes {
         this.id = id;
         this.subject = title;
         this.message = message;
-        this.delayed = true;
-        this.delay = 1000;
+        this.delayed = false;
         autoClear = true;
         action = "Default";
         largeIcon = smallIcon = "ic_launcher";
