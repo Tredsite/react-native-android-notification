@@ -43,7 +43,7 @@ var Notification = {
       }
   },
 
-  registerDevice() {
+  registerDevice: function() {
     var component = this;
     DeviceEventEmitter.addListener('GCMNotificationID', function(e) {
       if (component.registerCallback) {
@@ -54,7 +54,11 @@ var Notification = {
 
     DeviceEventEmitter.addListener('GCMMessageEvent', function(e) {
       if (component.notificationCallback) {
-        component.notificationCallback(e.message);
+        component.notificationCallback({
+          getMessage: function() {
+            return e.message;
+          }
+        });
       }
       console.info("GCMMessageEvent: " + e.message)
     });
@@ -72,7 +76,10 @@ var Notification = {
   },
   
   module: ReactNativeNotificationModule
-}
+};
+
+module.exports = Notification;
+
 function encodeNativeNotification(attributes) {
   if (typeof attributes === 'string') attributes = JSON.parse(attributes);
   // Set defaults
@@ -202,14 +209,12 @@ function decodeNativeNotification(attributes) {
 
   return attributes;
 }
-module.exports = Notification;
 
 DeviceEventEmitter.addListener('ReactNativeNotificationEventFromNative', function(e) {
   var event = {
     action: e.action,
     payload: JSON.parse(e.payload)
-  }
+  };
 
   DeviceEventEmitter.emit('jsMoudleReactNativeNotificationClick', event);
 });
-
