@@ -22,7 +22,7 @@ public class GCMNotificationListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle bundle) {
-        String notificationString = bundle.getString("default");
+        String notificationString = bundle.getString("message");
 
         if (notificationString != null) {
             Intent broadcastIntent = new Intent("GCMMessageEvent");
