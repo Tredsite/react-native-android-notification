@@ -183,7 +183,7 @@ public class NotificationAttributes {
         this.delayed = false;
         autoClear = true;
         action = "Default";
-        largeIcon = smallIcon = "ic_launcher";
+        largeIcon = smallIcon = "ic_stat_tred_icon";
         payload = "{}";
         scheduled = false;
         if (this.subject.length() > 0) {

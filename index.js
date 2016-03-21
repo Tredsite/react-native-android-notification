@@ -86,7 +86,7 @@ module.exports = Notification;
 function encodeNativeNotification(attributes) {
   if (typeof attributes === 'string') attributes = JSON.parse(attributes);
   // Set defaults
-  if (!attributes.smallIcon) attributes.smallIcon = 'ic_launcher';
+  if (!attributes.smallIcon) attributes.smallIcon = 'ic_stat_tred_icon';
   if (!attributes.id) attributes.id = parseInt(Math.random() * 100000);
   if (!attributes.action) attributes.action = 'DEFAULT';
   if (!attributes.payload) attributes.payload = {};
