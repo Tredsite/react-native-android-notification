@@ -57,6 +57,9 @@ var Notification = {
         component.notificationCallback({
           getMessage: function() {
             return e.message;
+          },
+          getData: function() {
+            console.log(e);
           }
         });
       }
