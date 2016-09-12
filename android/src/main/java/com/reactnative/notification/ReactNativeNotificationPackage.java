@@ -22,18 +22,12 @@ import java.util.List;
  * The React package.
  */
 public class ReactNativeNotificationPackage implements ReactPackage {
-    private Activity mActivity = null;
-
-    public ReactNativeNotificationPackage(Activity activity) {
-        mActivity = activity;
-    }
-
     @Override
     public List<NativeModule> createNativeModules(
             ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new ReactNativeNotificationModule(reactContext, mActivity));
+        modules.add(new ReactNativeNotificationModule(reactContext));
         return modules;
     }
 
@@ -46,5 +40,4 @@ public class ReactNativeNotificationPackage implements ReactPackage {
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         return Arrays.<ViewManager>asList();
     }
-
 }

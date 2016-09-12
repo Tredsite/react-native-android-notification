@@ -52,11 +52,11 @@ public class ReactNativeNotificationModule extends ReactContextBaseJavaModule {
     /**
      * Constructor.
      */
-    public ReactNativeNotificationModule(ReactApplicationContext reactContext, Activity activity) {
+    public ReactNativeNotificationModule(ReactApplicationContext reactContext) {
         super(reactContext);
 
         this.mContext = reactContext;
-        this.mActivity = activity;
+        this.mActivity = getCurrentActivity();
         this.mNotificationManager = (NotificationManager) new NotificationManager(reactContext);
 
 
